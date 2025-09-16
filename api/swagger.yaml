@@ -1,0 +1,70 @@
+openapi: 3.0.3
+info:
+  title: SalaryService Employee API
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+paths:
+  /employees:
+    get:
+      summary: Get all employees
+      responses:
+        '200':
+          description: List of employees
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Employee'
+    post:
+      summary: Create a new employee
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Employee'
+      responses:
+        '201':
+          description: Employee created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+  /employees/{id}:
+    get:
+      summary: Get an employee by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Employee found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+        '404':
+          description: Employee not found
+components:
+  schemas:
+    Employee:
+      type: object
+      properties:
+        Company:
+          type: string
+        Name:
+          type: string
+        Role:
+          type: string
+        Paygrade:
+          type: string
+      required:
+        - Company
+        - Name
+        - Role
+        - Paygrade
