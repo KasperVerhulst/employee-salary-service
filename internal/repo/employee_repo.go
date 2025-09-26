@@ -2,6 +2,7 @@ package repo
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/KasperVerhulst/SalaryService/internal/models"
 )
@@ -9,6 +10,8 @@ import (
 type EmployeeRepository interface {
 	FindAll() []models.Employee
 	FindByID(ID int) (models.Employee, error)
+	FindByCompany(company string) ([]models.Employee, error)
+
 	Store(e models.Employee)
 }
 
@@ -49,6 +52,19 @@ func (r *InMemoryEmployeeRepository) FindByID(ID int) (models.Employee, error) {
 		}
 	}
 	return models.Employee{}, errors.New("employee not found")
+}
+
+func (r *InMemoryEmployeeRepository) FindByCompany(company string) ([]models.Employee, error) {
+	var result []models.Employee
+	for _, e := range r.employees {
+		if strings.ToLower(e.Company) == strings.ToLower(company) {
+			result = append(result, e)
+		}
+	}
+	if len(result) == 0 {
+		return nil, errors.New("no employees found for company")
+	}
+	return result, nil
 }
 
 func (r *InMemoryEmployeeRepository) Store(e models.Employee) {
