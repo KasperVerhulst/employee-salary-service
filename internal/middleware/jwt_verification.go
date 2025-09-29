@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"slices"
 	"strings"
 
 	"github.com/KasperVerhulst/SalaryService/config"
@@ -14,11 +15,12 @@ import (
 type CustomClaims struct {
 	jwt.RegisteredClaims
 	Company string `json:"company"`
+	Scopes  string `json:"scope"`
 }
 
 type UserCtxKey struct{}
 
-func JWTMiddleware(next http.Handler, cfg *config.Config) http.Handler {
+func JWTMiddleware(next http.Handler, cfg *config.Config, requiredScope string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		// Return 401 Unauthorized if no Authorization header is present
@@ -82,6 +84,12 @@ func JWTMiddleware(next http.Handler, cfg *config.Config) http.Handler {
 				http.Error(w, "Invalid JWT claims", http.StatusUnauthorized)
 				return
 			}
+		}
+
+		// Check if the required scope is present in the JWT
+		if !slices.Contains(strings.Split(claims.Scopes, " "), requiredScope) {
+			http.Error(w, "Insufficient scope", http.StatusForbidden)
+			return
 		}
 
 		// Add the company from the token claims to the request context
