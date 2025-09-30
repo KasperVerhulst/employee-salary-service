@@ -14,8 +14,8 @@ import (
 
 type CustomClaims struct {
 	jwt.RegisteredClaims
-	Company string `json:"company"`
-	Scopes  string `json:"scope"`
+	Company string   `json:"company"`
+	Scopes  []string `json:"scope"`
 }
 
 type UserCtxKey struct{}
@@ -87,7 +87,7 @@ func JWTMiddleware(next http.Handler, cfg *config.Config, requiredScope string) 
 		}
 
 		// Check if the required scope is present in the JWT
-		if !slices.Contains(strings.Split(claims.Scopes, " "), requiredScope) {
+		if !slices.Contains(claims.Scopes, requiredScope) {
 			http.Error(w, "Insufficient scope", http.StatusForbidden)
 			return
 		}
