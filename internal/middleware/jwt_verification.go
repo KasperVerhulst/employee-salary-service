@@ -30,7 +30,7 @@ func JWTMiddleware(next http.Handler, cfg *config.Config, requiredScope string) 
 			return
 		}
 
-		// 2. The header should be in the format "Bearer <token>"
+		// The header should be in the format "Bearer <token>"
 		headerParts := strings.Split(authHeader, " ")
 		if len(headerParts) != 2 || strings.ToLower(headerParts[0]) != "bearer" {
 			http.Error(w, "Authorization header must be in Bearer {token} format", http.StatusUnauthorized)
@@ -39,10 +39,13 @@ func JWTMiddleware(next http.Handler, cfg *config.Config, requiredScope string) 
 
 		jwtTokenString := headerParts[1]
 
-		var token *jwt.Token
-		var parseErr error
-		var claims *CustomClaims
-		var ok bool
+		var (
+			token    *jwt.Token
+			parseErr error
+			claims   *CustomClaims
+			ok       bool
+		)
+
 		if cfg.VerifySignature {
 
 			// Create the keyfunc.Keyfunc to fetch the public key for the signature the jwk_uri
@@ -60,6 +63,8 @@ func JWTMiddleware(next http.Handler, cfg *config.Config, requiredScope string) 
 				http.Error(w, "Invalid JWT", http.StatusUnauthorized)
 				return
 			}
+			log.Println("Validated token signature with JWKs")
+
 			claims = token.Claims.(*CustomClaims)
 
 		} else {

@@ -9,7 +9,7 @@ type Employee struct {
 	Paygrade string `json:"paygrade"`
 }
 
-type CreateEmployeeRequest struct {
+type NewEmployeeRequest struct {
 	Company  string `json:"company"`
 	Name     string `json:"name"`
 	Role     string `json:"role"`

@@ -12,7 +12,9 @@ type EmployeeRepository interface {
 	FindByID(ID int) (models.Employee, error)
 	FindByCompany(company string) ([]models.Employee, error)
 
-	Store(e models.Employee)
+	Store(e models.Employee) error
+
+	DeleteByID(ID int) error
 }
 
 type InMemoryEmployeeRepository struct {
@@ -67,6 +69,21 @@ func (r *InMemoryEmployeeRepository) FindByCompany(company string) ([]models.Emp
 	return result, nil
 }
 
-func (r *InMemoryEmployeeRepository) Store(e models.Employee) {
+func (r *InMemoryEmployeeRepository) Store(e models.Employee) error {
 	r.employees = append(r.employees, e)
+	return nil
+}
+
+func (r *InMemoryEmployeeRepository) DeleteByID(ID int) error {
+	for i, e := range r.employees {
+		if e.ID == ID {
+			r.employees = append(r.employees[:i], r.employees[i+1:]...)
+			return nil
+		}
+	}
+	return errors.New("employee not found")
+}
+
+func (r *InMemoryEmployeeRepository) Update(e models.Employee) error {
+	return errors.New("employee not found")
 }
