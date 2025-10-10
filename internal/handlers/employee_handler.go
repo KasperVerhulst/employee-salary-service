@@ -62,15 +62,9 @@ func (h *Handler) GetEmployee(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	employee, err := h.employeeRepo.FindByID(id)
+	employee, err := h.employeeRepo.FindByIDAndCompany(id, company)
 
 	if err != nil {
-		http.Error(w, "Employee not found", http.StatusNotFound)
-		return
-	}
-
-	// if company claim is present in token, check if employee belongs to that company
-	if !(company == "") && strings.ToLower(employee.Company) != strings.ToLower(company) {
 		http.Error(w, "Employee not found", http.StatusNotFound)
 		return
 	}
@@ -130,14 +124,9 @@ func (h *Handler) UpdateEmployee(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	employee, err := h.employeeRepo.FindByID(id)
+	employee, err := h.employeeRepo.FindByIDAndCompany(id, company)
 
 	if err != nil {
-		http.Error(w, "Employee not found", http.StatusNotFound)
-		return
-	}
-
-	if !(company == "") && strings.ToLower(employee.Company) != strings.ToLower(company) {
 		http.Error(w, "Employee not found", http.StatusNotFound)
 		return
 	}

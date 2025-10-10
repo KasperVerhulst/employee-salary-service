@@ -11,7 +11,7 @@ type EmployeeRepository interface {
 	FindAll() []models.Employee
 	FindByID(ID int) (models.Employee, error)
 	FindByCompany(company string) ([]models.Employee, error)
-
+	FindByIDAndCompany(ID int, company string) (models.Employee, error)
 	Store(e models.Employee) error
 
 	DeleteByID(ID int) error
@@ -67,6 +67,15 @@ func (r *InMemoryEmployeeRepository) FindByCompany(company string) ([]models.Emp
 		return nil, errors.New("no employees found for company")
 	}
 	return result, nil
+}
+
+func (r *InMemoryEmployeeRepository) FindByIDAndCompany(ID int, company string) (models.Employee, error) {
+	for _, e := range r.employees {
+		if e.ID == ID && e.Company == company {
+			return e, nil
+		}
+	}
+	return models.Employee{}, errors.New("employee not found for company")
 }
 
 func (r *InMemoryEmployeeRepository) Store(e models.Employee) error {
