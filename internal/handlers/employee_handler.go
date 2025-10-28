@@ -44,6 +44,13 @@ func (h *Handler) GetAllEmployees(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// filter for pagination
+	employees, err := paginationRequest(employees, r.URL, 5, 10)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	// return all employees as json
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(employees)
@@ -88,7 +95,7 @@ func (h *Handler) CreateEmployee(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.logger.Println("Creating new employee: %+v\n", body.Name)
+	h.logger.Printf("Creating new employee: %+v\n", body.Name)
 
 	// create new employee
 	e := models.Employee{
@@ -184,7 +191,7 @@ func (h *Handler) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
 
 	// if company claim is present in token, check if employee belongs to that company
 	if (company == "") || strings.ToLower(employee.Company) != strings.ToLower(company) {
-		h.logger.Println("Cannot delete user %s from company %s", id, company)
+		h.logger.Printf("Cannot delete user %d from company %s", id, company)
 		http.Error(w, "Employee not found", http.StatusNotFound)
 		return
 	}
